@@ -1,24 +1,6 @@
-FROM golang:1.13-alpine3.11
+FROM golang:1.16-stretch
 
-RUN apk add --update --no-cache \
-    alsa-lib-dev \
-    bash \
-    bash-completion \
-    binutils \
-    ca-certificates \
-    coreutils \
-    curl \
-    findutils \
-    g++ \
-    git \
-    gnupg \
-    grep \
-    less \
-    make \
-    openssl \
-    protoc \
-    shellcheck \
-    util-linux
+RUN apt update && apt install -y libasound2-dev python3
 
 WORKDIR /earthly
 
@@ -57,9 +39,12 @@ lint:
 
 teatimer:
     FROM +code
+    COPY sounds/ready.mp3 cmd/teatimer/. # sound taken from https://github.com/faiface/beep
     ARG EARTHLY_GIT_HASH
+    ENV GOOS=linux
+    ENV GOARCH=amd64
     RUN go build -ldflags  "-X main.GitSha=$EARTHLY_GIT_HASH" -o teatimer cmd/teatimer/main.go
-    SAVE ARTIFACT teatimer AS LOCAL .
+    SAVE ARTIFACT teatimer AS LOCAL teatimer
 
 all:
     BUILD +lint

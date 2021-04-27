@@ -1,26 +1,41 @@
 package main
 
 import (
+	_ "embed"
+	"fmt"
+	"io"
 	"log"
-	"os"
+	"strings"
 	"time"
 
+	"github.com/cheggaaa/pb/v3"
 	"github.com/faiface/beep"
 	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
 )
 
-func main() {
-	f, err := os.Open("../Lame_Drivers_-_01_-_Frozen_Egg.mp3")
-	if err != nil {
-		log.Fatal(err)
-	}
+//go:embed ready.mp3
+var soundData string
 
-	streamer, format, err := mp3.Decode(f)
+func main() {
+	r := io.NopCloser(strings.NewReader(soundData))
+
+	streamer, format, err := mp3.Decode(r)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer streamer.Close()
+
+	d := time.Minute * 5
+	fmt.Printf("Starting timer for %v\n", d)
+	count := int(d / time.Millisecond)
+
+	bar := pb.StartNew(count)
+	for i := 0; i < count; i++ {
+		bar.Increment()
+		time.Sleep(time.Millisecond)
+	}
+	bar.Finish()
 
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 
