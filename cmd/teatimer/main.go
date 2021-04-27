@@ -69,40 +69,6 @@ func tbprint(x, y int, fg, bg termbox.Attribute, msg string) {
 }
 
 func printTeaIsReady() {
-	//	termbox.Init()
-	//.var colorRange []termbox.Attribute = []termbox.Attribute{
-	//.	termbox.ColorDefault,
-	//.	termbox.ColorBlack,
-	//.	termbox.ColorRed,
-	//.	termbox.ColorGreen,
-	//.	termbox.ColorYellow,
-	//.	termbox.ColorBlue,
-	//.	termbox.ColorMagenta,
-	//.	termbox.ColorCyan,
-	//.	termbox.ColorWhite,
-	//.	termbox.ColorDarkGray,
-	//.	termbox.ColorLightRed,
-	//.	termbox.ColorLightGreen,
-	//.	termbox.ColorLightYellow,
-	//.	termbox.ColorLightBlue,
-	//.	termbox.ColorLightMagenta,
-	//.	termbox.ColorLightCyan,
-	//.	termbox.ColorLightGray,
-	//.}
-
-	//.col := 5
-	//.row := 7
-	//.fg := colorRange[3]
-	//.bg := colorRange[6]
-
-	//.text := "tea is ready"
-	//.tbprint(col, row+0, fg, bg, text)
-
-	//.termbox.Flush()
-	//.termbox.PollEvent()
-
-	//.termbox.Close()
-
 	err := termbox.Init()
 	if err != nil {
 		panic(err)
