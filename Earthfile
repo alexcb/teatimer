@@ -1,14 +1,12 @@
-FROM golang:1.16-stretch
+VERSION 0.7
+FROM golang:1.20-bookworm
 
-RUN apt update && apt install -y libasound2-dev python3
+RUN apt update && apt install -y libasound2-dev python3 curl
 
 WORKDIR /earthly
 
 deps:
-    RUN go get golang.org/x/tools/cmd/goimports
-    RUN go get golang.org/x/lint/golint
-    RUN go get github.com/gordonklaus/ineffassign
-    RUN go get github.com/jackc/tern
+    RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.50.0
     COPY go.mod go.sum ./
     RUN go mod download
     SAVE ARTIFACT go.mod AS LOCAL go.mod
@@ -20,22 +18,8 @@ code:
 
 lint:
     FROM +code
-    RUN output="$(ineffassign . | grep -v '/earthly/earthfile2llb/parser/.*\.go')" ; \
-        if [ -n "$output" ]; then \
-            echo "$output" ; \
-            exit 1 ; \
-        fi
-    RUN output="$(goimports -d . 2>&1)" | grep -v '.*\.pb\.go' ; \
-        if [ -n "$output" ]; then \
-            echo "$output" ; \
-            exit 1 ; \
-        fi
-    RUN golint -set_exit_status ./...
-    RUN output="$(go vet ./... 2>&1)" ; \
-        if [ -n "$output" ]; then \
-            echo "$output" ; \
-            exit 1 ; \
-        fi
+    COPY ./.golangci.yaml ./
+    RUN golangci-lint run
 
 teatimer:
     FROM +code
